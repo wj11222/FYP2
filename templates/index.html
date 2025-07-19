@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Script Generator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --dark-bg: #0a0a0b;
+            --card-bg: rgba(255, 255, 255, 0.02);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --text-muted: rgba(255, 255, 255, 0.5);
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --accent-blue: #00d4ff;
+            --accent-purple: #8b5cf6;
+            --accent-pink: #ec4899;
+            --shadow-glow: 0 0 30px rgba(102, 126, 234, 0.3);
+            --shadow-strong: 0 20px 60px rgba(0, 0, 0, 0.4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--dark-bg);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.2) 0%, transparent 50%);
+            animation: float 20s ease-in-out infinite;
+            z-index: -1;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
+        /* Glass morphism container */
+        .glass-container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            box-shadow: var(--shadow-strong);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .glass-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+        }
+
+        .main-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 3rem;
+            position: relative;
+        }
+
+        /* Header with gradient text */
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+            animation: glow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { filter: drop-shadow(0 0 20px rgba(102, 126, 234, 0.5)); }
+            to { filter: drop-shadow(0 0 30px rgba(118, 75, 162, 0.7)); }
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            font-weight: 300;
+        }
+
+        /* Navigation buttons */
+        .nav-section {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 3rem;
+        }
+
+        .nav-btn {
+            padding: 0.8rem 2rem;
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            background: var(--card-bg);
+            color: var(--text-primary);
+            border: 1px solid var(--card-border);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-btn.active {
+            background: var(--primary-gradient);
+            border-color: transparent;
+            box-shadow: var(--shadow-glow);
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .nav-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .nav-btn:hover::before {
+            left: 100%;
+        }
+
+        /* Form styling */
+        .form-section {
+            margin-bottom: 2rem;
+        }
+
+        .form-label {
+            color: white !important; /* Ensured white color for better visibility */
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            display: block;
+            font-size: 0.95rem;
+        }
+
+        .form-control, .form-select {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            padding: 0.875rem 1.25rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            background: var(--glass-bg);
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1);
+            outline: none;
+        }
+
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.7); /* Slightly more visible placeholder */
+        }
+
+        textarea.form-control {
+            min-height: 120px;
+            resize: vertical;
+            line-height: 1.6;
+        }
+
+        /* Custom styling for select dropdown to improve visibility */
+        .form-select {
+            -webkit-appearance: none; /* Remove default arrow on WebKit browsers */
+            -moz-appearance: none;    /* Remove default arrow on Firefox */
+            appearance: none;         /* Remove default arrow */
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 6 6 6 6-6'/%3E%3C/svg%3E"); /* White SVG arrow */
+            background-repeat: no-repeat;
+            background-position: right 1.25rem center;
+            background-size: 16px 12px;
+        }
+
+        .form-select option {
+            background-color: var(--dark-bg); /* Darker background for options */
+            color: var(--text-primary);      /* White text for options */
+        }
+
+        /* Improve hover/focus state for options (behavior varies by browser) */
+        .form-select option:checked {
+            background-color: var(--accent-blue); /* Highlight selected option */
+            color: var(--dark-bg); /* Text color for selected option */
+        }
+        .form-select option:hover { /* This typically only works in Firefox */
+            background-color: var(--accent-purple);
+            color: white;
+        }
+
+
+        /* Advanced slider styling */
+        .slider-container {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-range {
+            width: 100%;
+            height: 6px;
+            background: var(--card-bg);
+            border-radius: 3px;
+            outline: none;
+            
+        }
+
+        .form-range::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: var(--primary-gradient);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .form-range::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.8);
+        }
+
+        .form-range::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: var(--primary-gradient);
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.5);
+        }
+
+        .slider-value {
+            position: absolute;
+            top: -35px;
+            right: 0;
+            background: var(--accent-blue);
+            color: var(--dark-bg);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            min-width: 50px;
+            text-align: center;
+        }
+
+        /* Grid layout for controls */
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Action buttons */
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            min-width: 180px;
+            justify-content: center;
+        }
+
+        .action-btn.primary {
+            background: var(--primary-gradient);
+            color: white;
+            box-shadow: var(--shadow-glow);
+        }
+
+        .action-btn.secondary {
+            background: var(--card-bg);
+            color: var(--text-primary);
+            border: 1px solid var(--card-border);
+        }
+
+        .action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+        }
+
+        .action-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Loading animation */
+        .loading-spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Output section */
+        .output-section {
+            margin-top: 3rem;
+            position: relative;
+        }
+
+        .output-container {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 2rem;
+            min-height: 120px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .output-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--primary-gradient);
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+
+        .output-container.loading::before {
+            animation: progress 2s ease-in-out infinite;
+        }
+
+        @keyframes progress {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .output-text {
+            color: var(--text-primary);
+            line-height: 1.7;
+            font-size: 1.05rem;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .output-text.loading {
+            color: var(--text-muted);
+            font-style: italic;
+            text-align: center;
+        }
+
+        .output-text.error {
+            color: var(--accent-pink);
+            text-align: center;
+        }
+
+        /* Copy button */
+        .copy-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: var(--success-gradient);
+            border: none;
+            border-radius: 8px;
+            padding: 0.5rem;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            opacity: 0;
+        }
+
+        .output-container:hover .copy-btn {
+            opacity: 1;
+        }
+
+        .copy-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* Metrics section */
+        .metrics-section {
+            margin-top: 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .metric-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--success-gradient);
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+
+        .metric-card:hover::before {
+            transform: translateX(0);
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 700;
+            background: var(--success-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* Sentence info */
+        .sentence-info {
+            background: var(--card-bg);
+            border: 1px solid var(--accent-blue);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sentence-info::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--accent-blue);
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .main-container {
+                margin: 1rem;
+                padding: 2rem;
+            }
+
+            .header h1 {
+                font-size: 2.5rem;
+            }
+
+            .controls-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .action-btn {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+
+        /* Ensure input and textarea text color is white when typing */
+        .form-control,
+        textarea.form-control {
+            color: var(--text-primary) !important; /* Forces text to be white */
+        }
+
+        /* Micro-interactions */
+        .form-control:focus,
+        .form-select:focus {
+            animation: inputFocus 0.3s ease;
+        }
+
+        @keyframes inputFocus {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
+        /* Tooltip styling */
+        .tooltip-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip-text {
+            visibility: hidden;
+            background: var(--dark-bg);
+            color: var(--text-primary);
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px 10px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -60px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.8rem;
+        }
+
+        .tooltip-container:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* Notification styles */
+        .notification-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1050; /* Bootstrap's modal-backdrop is 1040, dialog is 1050 */
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .notification {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            padding: 1rem 1.5rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            animation: slideInRight 0.5s ease-out forwards;
+            opacity: 0; /* Start hidden for animation */
+            min-width: 250px;
+            max-width: 350px;
+        }
+
+        .notification.info { border-left: 5px solid var(--accent-blue); }
+        .notification.success { border-left: 5px solid #28a745; }
+        .notification.warning { border-left: 5px solid #ffc107; }
+        .notification.error { border-left: 5px solid #dc3545; }
+
+        .notification i {
+            font-size: 1.2rem;
+            margin-right: 0.5rem;
+        }
+
+        /* Notification animations */
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; transform: translateY(10px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container glass-container">
+        <div class="header">
+            <h1><i class="fas fa-magic"></i> Script Generator</h1>
+            <p>Transform your ideas into compelling text with advanced AI</p>
+        </div>
+        
+        <div class="nav-section">
+            <a href="/" class="nav-btn active">
+                <i class="fas fa-wand-magic-sparkles"></i>
+                Generator
+            </a>
+            <a href="/history" class="nav-btn">
+                <i class="fas fa-history"></i>
+                History
+            </a>
+        </div>
+        
+        <div class="form-section">
+            <label for="prompt" class="form-label">
+                <i class="fas fa-pencil-alt"></i> Your Prompt
+            </label>
+            <textarea class="form-control" id="prompt" rows="5" placeholder="Enter your creative prompt here and watch the magic happen..." required></textarea>
+        </div>
+        
+        <div class="controls-grid">
+            <div class="slider-container">
+                <label for="temperature" class="form-label">
+                    <i class="fas fa-thermometer-half" data-bs-toggle="tooltip" title="Controls randomness. Lower values make output more focused; higher values more creative."></i> Creativity Level
+                </label>
+                <input type="range" class="form-range" id="temperature" min="0.0" max="2.0" step="0.1" value="0.7">
+                <div class="slider-value" id="temp-value">0.7</div>
+            </div>
+            
+            <div class="form-section">
+                <label for="max_tokens" class="form-label">
+                    <i class="fas fa-align-left" data-bs-toggle="tooltip" title="Limits the length of the generated output. Higher values = longer responses."></i> Max Tokens
+                </label>
+                <input type="number" class="form-control" id="max_tokens" min="1" max="1000" value="150">
+            </div>
+            
+            <div class="slider-container">
+                <label for="top_p" class="form-label">
+                    <i class="fas fa-filter" data-bs-toggle="tooltip" title="Nucleus sampling. Limits text generation to the top p probability mass. 0.9 is a good balance."></i> Focus Level
+                </label>
+                <input type="range" class="form-range" id="top_p" min="0.0" max="1.0" step="0.05" value="0.9">
+                <div class="slider-value" id="top-p-value">0.9</div>
+            </div>
+            
+            <div class="form-section">
+                <label for="top_k" class="form-label">
+                    <i class="fas fa-layer-group" data-bs-toggle="tooltip" title="Restricts the next token choices to the top K most likely. 0 = no restriction."></i> Top K
+                </label>
+                <input type="number" class="form-control" id="top_k" min="0" max="1000" value="40">
+            </div>
+            
+            <div class="form-section" style="grid-column: 1 / -1;">
+                <label for="model" class="form-label">
+                    <i class="fas fa-robot"></i> AI Model
+                </label>
+                <select class="form-select" id="model">
+                    <option value="llama2">Llama 2 (Recommended)</option>
+                    <option value="llama2:latest">Llama 2 Latest</option>
+                    <option value="Gemma">Gemma</option>
+                    <option value="Mistral">Mistral</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="action-buttons">
+            <button class="action-btn primary" onclick="generateText()" id="generateBtn">
+                <i class="fas fa-play-circle"></i>
+                Generate Script
+            </button>
+            <button class="action-btn secondary" onclick="clearOutput()" title="Clears the prompt, output, and resets all sliders and settings to default.">
+                <i class="fas fa-refresh"></i>
+                Reset All
+            </button>
+        </div>
+        
+        <div class="output-section">
+            <label class="form-label">
+                <i class="fas fa-sparkles"></i> Generated Output
+            </label>
+            <div class="output-container" id="outputContainer">
+                <div class="output-text" id="output">Ready to create something amazing? Click "Generate Magic" to begin...</div>
+                <button class="copy-btn" onclick="copyToClipboard('output')" title="Copy to clipboard">
+                    <i class="fas fa-copy"></i>
+                </button>
+            </div>
+            <div id="sentence-info" class="sentence-info" style="display: none;"></div>
+        </div>
+        
+        <div class="metrics-section" id="metrics" style="display: none;">
+            <div class="metric-card">
+                <div class="metric-value" id="response-time">-</div>
+                <div class="metric-label">Response Time (ms)</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value" id="tokens-generated">-</div>
+                <div class="metric-label">Tokens Generated</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value" id="tokens-per-second">-</div>
+                <div class="metric-label">Tokens/Second</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value" id="sentence-count">-</div>
+                <div class="metric-label">Complete Sentences</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="notification-container" class="notification-container"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Update slider values with animations
+        document.getElementById('temperature').addEventListener('input', function() {
+            const value = this.value;
+            document.getElementById('temp-value').textContent = value;
+            document.getElementById('temp-value').style.animation = 'none';
+            setTimeout(() => {
+                document.getElementById('temp-value').style.animation = 'pulse 0.3s ease';
+            }, 10);
+        });
+        
+        document.getElementById('top_p').addEventListener('input', function() {
+            const value = this.value;
+            document.getElementById('top-p-value').textContent = value;
+            document.getElementById('top-p-value').style.animation = 'none';
+            setTimeout(() => {
+                document.getElementById('top-p-value').style.animation = 'pulse 0.3s ease';
+            }, 10);
+        });
+
+        // Add pulse animation for slider values
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes pulse {
+                0% { transform: scale(1); }
+                50% { transform: scale(1.1); }
+                100% { transform: scale(1); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        async function generateText() {
+            const prompt = document.getElementById('prompt').value;
+            const temperature = parseFloat(document.getElementById('temperature').value);
+            const maxTokens = parseInt(document.getElementById('max_tokens').value);
+            const topP = parseFloat(document.getElementById('top_p').value);
+            const topK = parseInt(document.getElementById('top_k').value);
+            const model = document.getElementById('model').value;
+            
+            if (!prompt.trim()) {
+                showNotification('Please enter a prompt to generate text.', 'warning');
+                return;
+            }
+            
+            const outputDiv = document.getElementById('output');
+            const outputContainer = document.getElementById('outputContainer');
+            const generateBtn = document.getElementById('generateBtn');
+            const metricsDiv = document.getElementById('metrics');
+            const sentenceInfoDiv = document.getElementById('sentence-info');
+            
+            // Show loading state with enhanced animations
+            outputDiv.textContent = 'Generating your masterpiece... Please wait...';
+            outputDiv.className = 'output-text loading';
+            outputContainer.className = 'output-container loading';
+            generateBtn.disabled = true;
+            generateBtn.innerHTML = '<div class="loading-spinner"></div> Generating...';
+            metricsDiv.style.display = 'none';
+            sentenceInfoDiv.style.display = 'none';
+            
+            try {
+                const response = await fetch('/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        prompt: prompt,
+                        temperature: temperature,
+                        max_tokens: maxTokens,
+                        top_p: topP,
+                        top_k: topK,
+                        model: model
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    outputDiv.textContent = data.response;
+                    outputDiv.className = 'output-text';
+                    outputContainer.className = 'output-container';
+                    
+                    // Animate metrics appearance
+                    setTimeout(() => {
+                        const tokensGenerated = data.response.split(/\s+/).filter(word => word.length > 0).length;
+                        const tokensPerSecond = (tokensGenerated / (data.response_time / 1000)).toFixed(2);
+                        
+                        document.getElementById('response-time').textContent = data.response_time;
+                        document.getElementById('tokens-generated').textContent = tokensGenerated;
+                        document.getElementById('tokens-per-second').textContent = tokensPerSecond;
+                        document.getElementById('sentence-count').textContent = data.sentence_count;
+                        
+                        metricsDiv.style.display = 'grid';
+                        metricsDiv.style.opacity = '0';
+                        metricsDiv.style.animation = 'fadeInUp 0.5s ease forwards';
+                        
+                        if (data.sentence_analysis && data.sentence_analysis.length > 0) {
+                            sentenceInfoDiv.innerHTML = `
+                                <strong><i class="fas fa-info-circle"></i> Sentence Analysis:</strong><br>
+                                ${data.sentence_analysis.join('<br>')}
+                            `;
+                            sentenceInfoDiv.style.display = 'block';
+                            sentenceInfoDiv.style.animation = 'fadeInUp 0.5s ease 0.2s forwards';
+                        }
+                    }, 300);
+                    
+                    showNotification('Text generated successfully!', 'success');
+                } else {
+                    outputDiv.textContent = `Error: ${data.error || 'An unknown error occurred.'}`;
+                    outputDiv.className = 'output-text error';
+                    outputContainer.className = 'output-container';
+                    showNotification('Generation failed. Please try again.', 'error');
+                }
+            } catch (error) {
+                console.error('Fetch error:', error);
+                outputDiv.textContent = `Network Error: Could not connect to the server. (${error.message})`;
+                outputDiv.className = 'output-text error';
+                outputContainer.className = 'output-container';
+                showNotification('Network error. Please check your connection.', 'error');
+            } finally {
+                generateBtn.disabled = false;
+                generateBtn.innerHTML = '<i class="fas fa-play-circle"></i> Generate Magic';
+            }
+        }
+        
+        function clearOutput() {
+            // Animate the clearing process
+            document.getElementById('prompt').value = '';
+            document.getElementById('output').textContent = 'Ready to create something amazing? Click "Generate Magic" to begin...';
+            document.getElementById('output').className = 'output-text';
+            document.getElementById('outputContainer').className = 'output-container';
+            document.getElementById('metrics').style.display = 'none';
+            document.getElementById('sentence-info').style.display = 'none';
+            
+            // Reset controls with animation
+            document.getElementById('temperature').value = 0.7;
+            document.getElementById('temp-value').textContent = 0.7;
+            document.getElementById('max_tokens').value = 150;
+            document.getElementById('top_p').value = 0.9;
+            document.getElementById('top-p-value').textContent = 0.9;
+            document.getElementById('top_k').value = 40;
+            document.getElementById('model').value = 'llama2';
+            
+            showNotification('All cleared! Ready for new input.', 'info');
+        }
+
+        async function copyToClipboard(elementId) {
+                    try {
+                        const textToCopy = document.getElementById(elementId).innerText;
+                        await navigator.clipboard.writeText(textToCopy);
+                        showNotification('Copied to clipboard!', 'success');
+                    } catch (err) {
+                        console.error('Failed to copy: ', err);
+                        showNotification('Failed to copy text.', 'error');
+                    }
+                }
+
+        // Enhanced notification system
+        function showNotification(message, type = 'info') {
+            const notificationContainer = document.getElementById('notification-container');
+            if (!notificationContainer) {
+                console.error('Notification container not found!');
+                return;
+            }
+
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <i class="fas fa-${getIcon(type)}"></i>
+                ${message}
+            `;
+            
+            notificationContainer.appendChild(notification);
+
+            // Trigger animation
+            setTimeout(() => {
+                notification.style.opacity = '1';
+                notification.style.transform = 'translateX(0)';
+            }, 10); // Small delay to ensure reflow for animation
+
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                notification.style.animation = 'fadeOut 0.5s ease forwards';
+                notification.addEventListener('animationend', () => {
+                    notification.remove();
+                });
+            }, 5000);
+        }
+
+        function getIcon(type) {
+            switch (type) {
+                case 'success': return 'check-circle';
+                case 'error': return 'times-circle';
+                case 'warning': return 'exclamation-triangle';
+                case 'info': return 'info-circle';
+                default: return 'bell';
+            }
+        }
+                // Enable Bootstrap tooltips globally
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    </script>
+</body>
+</html>

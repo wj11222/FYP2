@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Text Generator History</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Custom Color Palette (CSS Variables) - Must match index.html for consistency */
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --dark-bg: #0a0a0b;
+            --card-bg: rgba(255, 255, 255, 0.02);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --text-muted: rgba(255, 255, 255, 0.5);
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --accent-blue: #00d4ff;
+            --accent-purple: #8b5cf6;
+            --accent-pink: #ec4899;
+            --shadow-glow: 0 0 30px rgba(102, 126, 234, 0.3);
+            --shadow-strong: 0 20px 60px rgba(0, 0, 0, 0.4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--dark-bg);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated background - Copied from index.html */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.2) 0%, transparent 50%);
+            animation: float 20s ease-in-out infinite;
+            z-index: -1;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
+        /* Glass morphism container - Copied from index.html */
+        .glass-container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            box-shadow: var(--shadow-strong);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .glass-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+        }
+
+        .main-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 3rem;
+            position: relative;
+        }
+
+        /* Header with gradient text - Copied from index.html */
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+            animation: glow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { filter: drop-shadow(0 0 20px rgba(102, 126, 234, 0.5)); }
+            to { filter: drop-shadow(0 0 30px rgba(118, 75, 162, 0.7)); }
+        }
+
+        /* Navigation buttons - Copied from index.html */
+        .nav-section {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 3rem;
+        }
+
+        .nav-btn {
+            padding: 0.8rem 2rem;
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            background: var(--card-bg);
+            color: var(--text-primary);
+            border: 1px solid var(--card-border);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-btn.active {
+            background: var(--primary-gradient);
+            border-color: transparent;
+            box-shadow: var(--shadow-glow);
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .nav-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .nav-btn:hover::before {
+            left: 100%;
+        }
+
+        /* Form controls (e.g., search input) */
+        .form-control {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            color: var(--text-primary) !important; /* Ensure text is white */
+            padding: 0.875rem 1.25rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            background: var(--glass-bg);
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1);
+            outline: none;
+        }
+
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* History Controls */
+        .history-controls {
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .history-controls .btn {
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .history-controls .btn-danger {
+            background: var(--secondary-gradient); /* Use a vibrant gradient for delete */
+            color: white;
+            border: none;
+            box-shadow: 0 5px 15px rgba(245, 87, 108, 0.4);
+        }
+
+        .history-controls .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(245, 87, 108, 0.6);
+            background: linear-gradient(135deg, #f5576c 0%, #f093fb 100%); /* Slightly reverse on hover */
+        }
+
+        /* History Stats (Metric Cards) */
+        .history-stats .stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .history-stats .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--success-gradient); /* Use success gradient for top border */
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+
+        .history-stats .stat-card:hover::before {
+            transform: translateX(0);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            background: var(--success-gradient); /* Use success gradient for text */
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* History Item */
+        .history-item {
+            background: var(--glass-bg); /* Use glass background for items */
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+            overflow: hidden; /* Ensure inner elements respect border-radius */
+        }
+
+        .history-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        .history-header {
+            background: rgba(255, 255, 255, 0.05); /* Slightly lighter glass effect for header */
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .history-meta strong {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .history-settings {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .delete-btn {
+            background: var(--secondary-gradient);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .delete-btn:hover {
+            background: linear-gradient(135deg, #f5576c 0%, #f093fb 100%);
+            transform: translateY(-1px);
+        }
+
+        .history-content {
+            padding: 1.5rem;
+        }
+
+        .prompt-section, .response-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .prompt-label, .response-label {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.75rem;
+            display: block;
+            font-size: 0.95rem;
+        }
+        
+        /* Added for copy button alignment */
+        .response-label-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem; /* Ensure consistent spacing */
+        }
+
+        .prompt-text, .response-text {
+            background: rgba(0,0,0,0.1); /* Darker background for text areas */
+            padding: 1rem;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            border: 1px solid rgba(255,255,255,0.08);
+            color: var(--text-secondary);
+        }
+
+        .prompt-text {
+            border-left: 5px solid var(--accent-blue); /* Accent blue for prompt border */
+            font-style: italic;
+        }
+
+        .response-text {
+            border-left: 5px solid var(--accent-purple); /* Accent purple for response border */
+        }
+
+        .metrics-section {
+            border-top: 1px dashed rgba(255,255,255,0.1);
+            padding-top: 1.5rem;
+            margin-top: 1rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+        }
+
+        .metric-small {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            padding: 0.8rem;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: all 0.2s ease;
+        }
+
+        .metric-small:hover {
+            transform: translateY(-2px);
+            border-color: var(--accent-blue);
+        }
+
+        .metric-small-value {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--accent-blue); /* Use accent blue for small metrics */
+            margin-bottom: 3px;
+        }
+
+        .metric-small-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        .no-history {
+            text-align: center;
+            color: var(--text-muted);
+            font-style: italic;
+            padding: 50px 0;
+            font-size: 1.1rem;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+        }
+
+        /* Style for the new copy button */
+        .copy-btn {
+            background-color: transparent;
+            border: 1px solid var(--accent-blue);
+            color: var(--accent-blue);
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .copy-btn:hover {
+            background-color: var(--accent-blue);
+            color: var(--dark-bg); /* Or white, depending on contrast */
+            box-shadow: 0 5px 15px rgba(0, 212, 255, 0.4);
+            transform: translateY(-1px);
+        }
+        
+        .copy-btn:active {
+            transform: translateY(0);
+        }
+
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .main-container {
+                margin: 1rem;
+                padding: 1.5rem;
+            }
+
+            .header h1 {
+                font-size: 2.5rem;
+            }
+
+            .history-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .history-controls .form-control,
+            .history-controls .btn-danger {
+                width: 100%;
+                min-width: unset;
+            }
+
+            .metrics-section {
+                grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            }
+
+            .history-header {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 1rem;
+            }
+
+            .history-settings {
+                margin-top: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container glass-container">
+        <div class="header">
+            <h1><i class="fas fa-history"></i> Generation History</h1>
+            <p style="color: var(--text-secondary); font-size: 1.2rem; font-weight: 300;">Review your past AI creations and insights</p>
+        </div>
+        
+        <div class="nav-section">
+            <a href="/" class="nav-btn">
+                <i class="fas fa-wand-magic-sparkles"></i>
+                Generator
+            </a>
+            <a href="/history" class="nav-btn active">
+                <i class="fas fa-history"></i>
+                History
+            </a>
+        </div>
+        
+        <div class="history-controls">
+            <input type="text" class="form-control" id="searchInput" placeholder="Search prompts, responses, or models..." onkeyup="filterHistory()">
+            <button class="btn btn-danger" onclick="clearHistory()"><i class="fas fa-trash-alt"></i> Clear All History</button>
+        </div>
+        
+        <div class="row g-3 mb-4" id="historyStats">
+        </div>
+        
+        <div id="historyList">
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let historyData = [];
+        
+        async function loadHistory() {
+            try {
+                const response = await fetch('/api/history');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                historyData = await response.json();
+                renderHistory();
+                renderStats();
+            } catch (error) {
+                console.error('Error loading history:', error);
+                document.getElementById('historyList').innerHTML = `<div class="no-history" style="color: var(--accent-pink);">
+                    <i class="fas fa-exclamation-triangle"></i> Error loading history: ${error.message}. Please try again later.
+                </div>`;
+                document.getElementById('historyStats').innerHTML = '';
+            }
+        }
+        
+        function renderStats() {
+            const statsDiv = document.getElementById('historyStats');
+            statsDiv.innerHTML = '';
+            
+            if (historyData.length === 0) {
+                statsDiv.innerHTML = '<div class="col-12"><div class="no-history">No generation history yet. Start generating some text!</div></div>';
+                return;
+            }
+            
+            const totalGenerations = historyData.length;
+            const totalResponseTime = historyData.reduce((sum, item) => sum + (item.response_time || 0), 0);
+            const avgResponseTime = totalGenerations > 0 ? (totalResponseTime / totalGenerations).toFixed(0) : 0;
+            
+            const totalSentences = historyData.reduce((sum, item) => sum + (item.sentence_count || 0), 0);
+            const avgSentences = totalGenerations > 0 ? (totalSentences / totalGenerations).toFixed(1) : 0; // Not used in current stats display, but good to have.
+
+            const totalTokensGenerated = historyData.reduce((sum, item) => sum + (item.tokens_generated || 0), 0);
+            const totalTokensPerSecond = historyData.reduce((sum, item) => sum + (item.tokens_per_second || 0), 0);
+            const avgTokensPerSecond = totalGenerations > 0 ? (totalTokensPerSecond / totalGenerations).toFixed(2) : 0;
+
+            statsDiv.innerHTML = `
+                <div class="col-md-6 col-lg-3">
+                    <div class="stat-card">
+                        <div class="stat-value">${totalGenerations}</div>
+                        <div class="stat-label">Total Generations</div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="stat-card">
+                        <div class="stat-value">${avgResponseTime}ms</div>
+                        <div class="stat-label">Avg Response Time</div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="stat-card">
+                        <div class="stat-value">${totalTokensGenerated}</div>
+                        <div class="stat-label">Total Tokens</div>
+                    </div>
+                </div>
+                   <div class="col-md-6 col-lg-3">
+                    <div class="stat-card">
+                        <div class="stat-value">${avgTokensPerSecond}</div>
+                        <div class="stat-label">Avg Tokens/Sec</div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function renderHistory(dataToRender = historyData) {
+            const historyList = document.getElementById('historyList');
+            historyList.innerHTML = '';
+
+            if (dataToRender.length === 0) {
+                historyList.innerHTML = '<div class="no-history">No matching history items found.</div>';
+                return;
+            }
+            
+            historyList.innerHTML = dataToRender.map(item => `
+                <div class="history-item">
+                    <div class="history-header">
+                        <div class="history-meta">
+                            <strong><i class="fas fa-calendar-alt"></i> ${new Date(item.timestamp).toLocaleString()}</strong> | 
+                            <i class="fas fa-robot"></i> Model: ${item.model}
+                        </div>
+                        <div class="text-end">
+                            <div class="history-settings">
+                                <i class="fas fa-sliders-h"></i> Temp: ${item.temperature} | Tokens: ${item.max_tokens} | Top-P: ${item.top_p} | Top-K: ${item.top_k || 'N/A'}
+                            </div>
+                            <button class="btn btn-sm delete-btn mt-2" onclick="deleteHistoryItem('${item.id}')"><i class="fas fa-trash"></i> Delete</button>
+                        </div>
+                    </div>
+                    <div class="history-content">
+                        <div class="prompt-section">
+                            <div class="prompt-label"><i class="fas fa-pencil-alt"></i> Input Prompt:</div>
+                            <div class="prompt-text">${escapeHtml(item.prompt)}</div>
+                        </div>
+                        <div class="response-section">
+                            <div class="response-label-container">
+                                <div class="response-label"><i class="fas fa-sparkles"></i> Generated Response:</div>
+                                <button class="copy-btn" onclick="copyResponseText('${item.id}', this)" title="Copy to clipboard">
+                                    <i class="fas fa-copy"></i> Copy
+                                </button>
+                            </div>
+                            <div class="response-text" id="response-text-${item.id}">${escapeHtml(item.response)}</div>
+                        </div>
+                        <div class="metrics-section">
+                            <div class="metric-small">
+                                <div class="metric-small-value">${item.response_time || 0}ms</div>
+                                <div class="metric-small-label">Time</div>
+                            </div>
+                            <div class="metric-small">
+                                <div class="metric-small-value">${item.tokens_generated || 0}</div>
+                                <div class="metric-small-label">Tokens</div>
+                            </div>
+                            <div class="metric-small">
+                                <div class="metric-small-value">${item.tokens_per_second || 0}</div>
+                                <div class="metric-small-label">Tokens/Sec</div>
+                            </div>
+                            <div class="metric-small">
+                                <div class="metric-small-value">${item.sentence_count || 0}</div>
+                                <div class="metric-small-label">Sentences</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function filterHistory() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const filteredData = historyData.filter(item => 
+                item.prompt.toLowerCase().includes(searchTerm) ||
+                item.response.toLowerCase().includes(searchTerm) ||
+                item.model.toLowerCase().includes(searchTerm) ||
+                (item.timestamp && new Date(item.timestamp).toLocaleString().toLowerCase().includes(searchTerm))
+            );
+            renderHistory(filteredData);
+        }
+        
+        async function clearHistory() {
+            if (confirm('Are you sure you want to clear ALL history? This action cannot be undone.')) {
+                try {
+                    const response = await fetch('/api/history', { method: 'DELETE' });
+                    if (response.ok) {
+                        historyData = [];
+                        renderHistory();
+                        renderStats();
+                        alert('All history cleared successfully!');
+                    } else {
+                        const errorData = await response.json();
+                        alert(`Failed to clear history: ${errorData.error}`);
+                    }
+                } catch (error) {
+                    console.error('Error clearing history:', error);
+                    alert('An error occurred while trying to clear history.');
+                }
+            }
+        }
+        
+        async function deleteHistoryItem(id) {
+            if (confirm('Delete this specific history item?')) {
+                try {
+                    const response = await fetch(`/api/history/${id}`, { method: 'DELETE' });
+                    if (response.ok) {
+                        historyData = historyData.filter(item => item.id !== id);
+                        renderHistory();
+                        renderStats();
+                        alert('Item deleted successfully!');
+                    } else {
+                        const errorData = await response.json();
+                        alert(`Failed to delete item: ${errorData.error}`);
+                    }
+                } catch (error) {
+                    console.error('Error deleting history item:', error);
+                    alert('An error occurred while trying to delete the item.');
+                }
+            }
+        }
+
+        // NEW: Function to copy response text to clipboard
+        async function copyResponseText(id, buttonElement) {
+            const responseTextElement = document.getElementById(`response-text-${id}`);
+            if (responseTextElement) {
+                try {
+                    await navigator.clipboard.writeText(responseTextElement.textContent);
+                    
+                    // Provide visual feedback on the button
+                    const originalHtml = buttonElement.innerHTML;
+                    buttonElement.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                    buttonElement.style.backgroundColor = 'var(--success-gradient)'; // Apply success color
+                    buttonElement.style.borderColor = 'transparent';
+
+                    setTimeout(() => {
+                        buttonElement.innerHTML = originalHtml;
+                        buttonElement.style.backgroundColor = 'transparent'; // Revert to original background
+                        buttonElement.style.borderColor = 'var(--accent-blue)'; // Revert to original border
+                    }, 2000); // Revert after 2 seconds
+
+                } catch (err) {
+                    console.error('Failed to copy text: ', err);
+                    alert('Failed to copy text. Please ensure your browser supports clipboard API and you have granted permission.');
+                }
+            }
+        }
+
+        // Basic HTML escaping for display
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.appendChild(document.createTextNode(text));
+            return div.innerHTML;
+        }
+        
+        // Load history on page load
+        loadHistory();
+    </script>
+</body>
+</html>
