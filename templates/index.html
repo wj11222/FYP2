@@ -661,7 +661,7 @@
             <label for="prompt" class="form-label">
                 <i class="fas fa-pencil-alt"></i> Your Prompt
             </label>
-            <textarea class="form-control" id="prompt" rows="5" placeholder="Enter your creative prompt here and watch the magic happen..." required></textarea>
+            <textarea class="form-control" id="prompt" rows="5" placeholder="Enter your creative prompt here..." required></textarea>
         </div>
         
         <div class="controls-grid">
@@ -724,7 +724,7 @@
                 <i class="fas fa-sparkles"></i> Generated Output
             </label>
             <div class="output-container" id="outputContainer">
-                <div class="output-text" id="output">Ready to create something amazing? Click "Generate Magic" to begin...</div>
+                <div class="output-text" id="output">Ready to create something amazing? Click "Generate Script" to begin...</div>
                 <button class="copy-btn" onclick="copyToClipboard('output')" title="Copy to clipboard">
                     <i class="fas fa-copy"></i>
                 </button>
@@ -876,14 +876,14 @@
                 showNotification('Network error. Please check your connection.', 'error');
             } finally {
                 generateBtn.disabled = false;
-                generateBtn.innerHTML = '<i class="fas fa-play-circle"></i> Generate Magic';
+                generateBtn.innerHTML = '<i class="fas fa-play-circle"></i> Generate Script';
             }
         }
         
         function clearOutput() {
             // Animate the clearing process
             document.getElementById('prompt').value = '';
-            document.getElementById('output').textContent = 'Ready to create something amazing? Click "Generate Magic" to begin...';
+            document.getElementById('output').textContent = 'Ready to create something amazing? Click "Generate Script" to begin...';
             document.getElementById('output').className = 'output-text';
             document.getElementById('outputContainer').className = 'output-container';
             document.getElementById('metrics').style.display = 'none';

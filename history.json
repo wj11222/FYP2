@@ -1,5 +1,20 @@
 [
     {
+        "id": "774dacbe-7293-4172-b922-0428629a0679",
+        "timestamp": "2025-07-22T19:18:34.526733",
+        "prompt": "Scene: A busy Denny's diner in the morning\nTime: 8:38 AM\nCharacters: Catch (waiting)\nAction: Waiting and watching with anticipation or attention\nEmotions: Tension, expectation",
+        "response": "Catch shifted uncomfortably in his seat, his eyes fixed on the door as he waited for his breakfast buddy to arrive. 8:38 AM felt like an eternity since he had arrived, and he couldn't help but feel a growing sense of tension with each passing moment. Where was he? Was something wrong? Catch's mind raced with possibilities as he checked his watch for what felt like the hundredth time. Suddenly, the door swung open and a flustered-looking man rushed in, apologies streaming from his lips. \"Sorry I'm late, man! Traffic was a nightmare! \" Catch.",
+        "model": "llama2:latest",
+        "temperature": 0.7,
+        "max_tokens": 150,
+        "top_p": 0.9,
+        "top_k": 40,
+        "response_time": 30263,
+        "tokens_generated": 95,
+        "tokens_per_second": 3.14,
+        "sentence_count": 9
+    },
+    {
         "id": "8a14bc66-9fd7-48db-b450-1420a70719fa",
         "timestamp": "2025-07-12T13:16:48.433641",
         "prompt": "Scene: A busy Denny's diner in the morning\nTime: 8:38 AM\nCharacters: Catch (waiting)\nAction: Waiting and watching with anticipation or attention\nEmotions: Tension, expectation",
